@@ -1,0 +1,9 @@
+Created The project 
+Renamed the Project name fromt he index.html file
+Installed tailwind Css
+Configuration in vite.config adding tailwindCss in it
+clear the assets and add dummy data to it for continueing with dummy detials
+install react router dom, lucide react, react hot toast from the terminal
+instead of strict mode in main.jsx we imported BrowserRouter and placed it insead of react
+---Now we setup the basic react project----
+ now we will connect the code review tool with our project for that we are using CodeRabbit==> it finds the issue and suggest improvement This keeps code base clean . There is CLI feature helps to review your code in your OS terminal it supports all operating system.
