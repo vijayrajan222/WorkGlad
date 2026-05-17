@@ -9,4 +9,3 @@ const Employees = () => {
 }
 
 export default Employees
-Employees
