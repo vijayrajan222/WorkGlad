@@ -19,3 +19,9 @@
 *Link tag to write the path and icon will be written in the shown ui side 
 *the values of titile and subtitle passed from the app as props are taken from here and displayed 
 *widely used loader icons eye icons to show password button and all 
+*----Compleated the Login UI after creation used code rabbit to analyse or test the code through git and corrected all the changes and merged the push----
+*Now going to create the Pages after login in every pages Sidebarcomponent is a important one so we are creating that first 
+*To create we use useLocation hook to track the path we use useState to set the username.
+*We use useEffect hook to show the full userName when loaded . and another useEffect to turn off the sidebar immidatly when the page changes.
+-----SideBar----
+Userprofile is found by checking wether there is a username exist
