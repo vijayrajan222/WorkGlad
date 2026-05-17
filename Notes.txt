@@ -1,9 +1,21 @@
-Created The project 
-Renamed the Project name fromt he index.html file
-Installed tailwind Css
-Configuration in vite.config adding tailwindCss in it
-clear the assets and add dummy data to it for continueing with dummy detials
-install react router dom, lucide react, react hot toast from the terminal
-instead of strict mode in main.jsx we imported BrowserRouter and placed it insead of react
----Now we setup the basic react project----
- now we will connect the code review tool with our project for that we are using CodeRabbit==> it finds the issue and suggest improvement This keeps code base clean . There is CLI feature helps to review your code in your OS terminal it supports all operating system.
+* Created The project 
+* Renamed the Project name fromt he index.html file
+* Installed tailwind Css
+* Configuration in vite.config adding tailwindCss in it
+* Clear the assets and add dummy data to it for continueing with dummy detials
+* Install react router dom, lucide react, react hot toast from the terminal
+* Instead of strict mode in main.jsx we imported BrowserRouter and placed it insead of react
+----- Now we setup the basic react project ------
+* Now we will connect the code review tool with our project for that we are using CodeRabbit==> it finds the issue and suggest improvement This keeps code base clean . There is CLI feature helps to review your code in your OS terminal it supports all operating system.
+* Created a new branch and named it as development 
+* Setup Toaster in App.jsx and set the routers and there routes nested 
+* <Route path="*" element={<Navigate to="/dashboard" replace/>} /> == if we select any other routes other than mentioned routes it will go to the Navigate to dashboard  as the setting which is mentioned is in path "*".
+* At the app we changed the size of layout , the layout was visible along all the routes ,so adjusted the size of the layoutpage and maid the layout page a part of the all the other nested routes.
+----- Create component for the login page ------
+* At app.jsx set up the login routes for admin and employee form there itself add meta data like role,title,subtitle etc.
+* And started working in two components LoginLeftside this componet is reused in multiple pages like login landing and login for employee and admin
+* We used lucide-react to import the icond such as arrow icon admin icon user icon etc.
+---- After setting up the landing login pages started developing the login form and in the login form component . from this component we are using useState for the first time ----
+*Link tag to write the path and icon will be written in the shown ui side 
+*the values of titile and subtitle passed from the app as props are taken from here and displayed 
+*widely used loader icons eye icons to show password button and all 
