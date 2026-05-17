@@ -50,7 +50,7 @@ const LoginForm = ({ role, title, subtitle }) => {
               </button>
               </div>
             </div>
-              <button type='submit' disabled={loading} className='w-full py-3 bg-linear-to-r from-indigo-600 to-indigo-500 text-white rounded-md text-sm font-semibold hover:from-indigo-700 hover:to-indigo-600 disabled:opacity-50 transition-all duration-200 shadow-1g shadow-indigo-500/25 active:scale-[0.98] flex items-center justify-center'> {loading&&<Loader2Icon className='animate-spin h-4 w-4 mr-2'/>}</button>
+              <button type='submit' disabled={loading} className='w-full py-3 bg-linear-to-r from-indigo-600 to-indigo-500 text-white rounded-md text-sm font-semibold hover:from-indigo-700 hover:to-indigo-600 disabled:opacity-50 transition-all duration-200 shadow-1g shadow-indigo-500/25 active:scale-[0.98] flex items-center justify-center'> Sign In {loading&&<Loader2Icon className='animate-spin h-4 w-4 mr-2'/>}</button>
           </form>
         </div>
       </div>
