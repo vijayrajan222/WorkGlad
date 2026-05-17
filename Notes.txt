@@ -13,4 +13,9 @@
 * At the app we changed the size of layout , the layout was visible along all the routes ,so adjusted the size of the layoutpage and maid the layout page a part of the all the other nested routes.
 ----- Create component for the login page ------
 * At app.jsx set up the login routes for admin and employee form there itself add meta data like role,title,subtitle etc.
-* 
+* And started working in two components LoginLeftside this componet is reused in multiple pages like login landing and login for employee and admin
+* We used lucide-react to import the icond such as arrow icon admin icon user icon etc.
+---- After setting up the landing login pages started developing the login form and in the login form component . from this component we are using useState for the first time ----
+*Link tag to write the path and icon will be written in the shown ui side 
+*the values of titile and subtitle passed from the app as props are taken from here and displayed 
+*widely used loader icons eye icons to show password button and all 
