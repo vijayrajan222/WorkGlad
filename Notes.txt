@@ -25,3 +25,6 @@
 *We use useEffect hook to show the full userName when loaded . and another useEffect to turn off the sidebar immidatly when the page changes.
 -----SideBar----
 Userprofile is found by checking wether there is a username exist
+Nav items are sotred as a array of objects later thay are mapped in the side bar navigation part teh details such as name route and icon are provided in the object itself its mapped and shown in the side bar and there is a ternary operator which works when the user changes form empoyee to admin.
+As a part of seting up the dashboard now the exact logic comes in to picture Implemented loading component.
+
