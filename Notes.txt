@@ -25,3 +25,14 @@
 *We use useEffect hook to show the full userName when loaded . and another useEffect to turn off the sidebar immidatly when the page changes.
 -----SideBar----
 Userprofile is found by checking wether there is a username exist
+Nav items are sotred as a array of objects later thay are mapped in the side bar navigation part teh details such as name route and icon are provided in the object itself its mapped and shown in the side bar and there is a ternary operator which works when the user changes form empoyee to admin.
+As a part of seting up the dashboard now the exact logic comes in to picture Implemented loading component.
+---Created a emplyeedashboard-----
+in the dashboard there is a option to check the role of the user if it is a admin it uses admin component else employee componets now created employee components
+in the employee components we are getting thee data as props from the dashboard in the Dashboard side it as state using the useEffect hook with a time delay to fectch that time delay is compromised by a loading animation. 
+Here they are setting the dummy employee data to the data fromt he asset and passing it as props to the employee after checking the user is an empleyeee 
+In employee dashboard the data is splitted. Here in the employee dashbord we create a array for cards and the cards contains the details of the employee which is passed throught the dummy data.
+and the array of object Cards. has icon value title and subtitle destructured  for displaying 
+at the end of the componet we set up two link to connect to the other rout for marking the attendance and to apply leave.
+
+
