@@ -8,7 +8,7 @@ const Sidebar = () => {
     const { pathname } = useLocation()
     const [userName, setUserName] = useState("")
     const [mobileOpen, setMobileOpen] = useState(false)
-    const role = "" || "EMPLOYEE"
+    const role = "ADMIN" || "EMPLOYEE"
     const navItems = [
         { name: "Dashboard", href: "/Dashboard", icon: LayoutGridIcon },
         role === "ADMIN" ?
