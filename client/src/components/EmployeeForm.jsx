@@ -323,99 +323,71 @@ const EmployeeForm = ({
             {/* Account Setup */}
             <div className='border border-slate-200 rounded-2xl p-6'>
 
-                <h3 className='text-lg font-semibold text-slate-900 mb-6'>
+                <h3 className='text-lg font-medium text-slate-900 mb-6 pb-4 border-b border-slate-1'>
                     Account Setup
                 </h3>
 
-                <div className='grid grid-cols-1 sm:grid-cols-2 gap-5'>
+                <div className='grid grid-cols-1 sm:grid-cols-2 gap-5 text-sm text-slate-700'>
 
-                    {/* First Name */}
+
                     <div>
 
                         <label className="block mb-2 text-sm font-medium text-slate-700">
-                            First Name
+                            Work Email
                         </label>
 
                         <input
-                            name="firstName"
+                            name="email"
+                            type='email'
                             required
-                            defaultValue={initialData?.firstName}
+                            defaultValue={initialData?.email}
                             className='w-full border border-slate-200 rounded-xl px-4 py-2 outline-none'
                         />
 
                     </div>
 
-                    {/* Last Name */}
+                    {!isEditMode && (
+                        <div>
+
+                            <label className="block mb-2 text-sm font-medium text-slate-700">
+                                Temporary Password
+                            </label>
+
+                            <input
+                                name="Password"
+                                type='password'
+                                required
+                            />
+
+                        </div>
+                    )}
+                    {isEditMode && (
+                        <div>
+
+                            <label className="block mb-2 text-sm font-medium text-slate-700">
+                                Change Password (Optional)
+                            </label>
+
+                            <input
+                                name="Password"
+                                type='password'
+                                placeholder='Leave blank to keep current'
+                            />
+
+                        </div>
+                    )}
                     <div>
 
-                        <label className="block mb-2 text-sm font-medium text-slate-700">
-                            Last Name
-                        </label>
+                            <label className="block mb-2 text-sm font-medium text-slate-700">
+                                System Role
+                            </label>
 
-                        <input
-                            name="lastName"
-                            required
-                            defaultValue={initialData?.lastName}
-                            className='w-full border border-slate-200 rounded-xl px-4 py-2 outline-none'
-                        />
+                          <select name="role" defaultValue={initialData?.user?.role||"EMPLOYEE"}>
+                                <option value="EMPLOYEE">Employee</option>
+                                <option value="ADMIN">Admin</option>
+                          </select>
 
-                    </div>
-
-                    {/* Phone */}
-                    <div>
-
-                        <label className="block mb-2 text-sm font-medium text-slate-700">
-                            Phone Number
-                        </label>
-
-                        <input
-                            name="phone"
-                            required
-                            defaultValue={initialData?.phone}
-                            className='w-full border border-slate-200 rounded-xl px-4 py-2 outline-none'
-                        />
-
-                    </div>
-
-                    {/* Join Date */}
-                    <div>
-
-                        <label className="block mb-2 text-sm font-medium text-slate-700">
-                            Join Date
-                        </label>
-
-                        <input
-                            name="joinDate"
-                            type='date'
-                            required
-                            defaultValue={
-                                initialData?.joinDate
-                                    ? new Date(initialData.joinDate)
-                                        .toISOString()
-                                        .split("T")[0]
-                                    : ""
-                            }
-                            className='w-full border border-slate-200 rounded-xl px-4 py-2 outline-none'
-                        />
-
-                    </div>
-
-                    {/* Bio */}
-                    <div className='sm:col-span-2'>
-
-                        <label className="block mb-2 text-sm font-medium text-slate-700">
-                            Bio (Optional)
-                        </label>
-
-                        <textarea
-                            name="bio"
-                            rows={3}
-                            defaultValue={initialData?.bio}
-                            className='w-full border border-slate-200 rounded-xl px-4 py-3 outline-none resize-none'
-                            placeholder='Brief description...'
-                        />
-
-                    </div>
+                        </div>
 
                 </div>
 
