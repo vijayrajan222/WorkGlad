@@ -34,5 +34,32 @@ Here they are setting the dummy employee data to the data fromt he asset and pas
 In employee dashboard the data is splitted. Here in the employee dashbord we create a array for cards and the cards contains the details of the employee which is passed throught the dummy data.
 and the array of object Cards. has icon value title and subtitle destructured  for displaying 
 at the end of the componet we set up two link to connect to the other rout for marking the attendance and to apply leave.
+----Employee Mangaement----
+In employee management we have add employee update eployee and show employee list search employee and remove employee functionality.
+Initially we will set states for the employees  loading status searchsing stauts and department selection for editing the employee and show the create modal and set them on or off
+editEmployee is assinged as null because no object or employee is selected to edit 
+then we are fetching the employees from the dummy data using filter and while fetching we setLoding as true and we filter the employees with the department after filtering we will set the employees with the filterd data      setEmployees(filteredData) and for that we  give a time delay of 500ms
+we are using the use filter here to keep that the selector function should not work unnecessaryly without the selectDept changes we have set the selectDept as the dependancy array
+there is a useEffect written which will work when the user getting fetched
+there is a filter function written when searching the 3 detaisl employees firstname lasname and position are changed to lower case and the search is changed to lower case and chekc weterh that value inclues search. 
+but here includes doesnot work with the array it work with string the details of the employee is maid as a string and checked wether the value in the search includes the string if it works that becomes the filter value 
+justify-between means justivy contenet space-between.'
+select is used to dropdown and options are the options in it.
+We fetch employees and if the employee length is zeor then we return no employee found else we will map through the employees  and we will show the employcard component we pass the detaisl such as imp id emp ondelete an don edit function along with it as a property
+the employee which selected selection option and search values will be filtered and coponent card renders
+component card has functionality such as onDelete onEdit
+e.stopPropagation is written because if there is a div have onclik functionality and a button inside it has an onClick functionality. 
+
+.....Leave form.....
+we use state for leave  adn loading  we will create state to display a modal for isDeleted we will check if the user is false 
+we will fetch leaves form the asset we usecallbackfuntion to fetch dummyleaves list and a time out for loading 
+useEffect is used to fetch the leaves and from the feched leave we take out the approved leaves by filtering and categorise that filter as casual anual and sick
+create a leave status array and create related Lable icon and value 
+
+
+
+
+
+
 
 

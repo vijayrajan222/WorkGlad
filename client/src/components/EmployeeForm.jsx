@@ -365,7 +365,7 @@ const EmployeeForm = ({
                         <div>
 
                             <label className="block mb-2 text-sm font-medium text-slate-700">
-                                Change Password (Optional)
+                                Change Password (Optiona l)
                             </label>
 
                             <input

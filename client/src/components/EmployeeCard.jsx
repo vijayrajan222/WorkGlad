@@ -81,7 +81,7 @@ const EmployeeCard = ({ employee, onDelete, onEdit }) => {
 
                         <PencilIcon className="w-4 h-4" />
 
-                    </button>
+                    </button> 
 
                     {/* Delete Button */}
                     <button
