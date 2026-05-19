@@ -3,7 +3,7 @@ import {
   ArrowRightIcon,
   CalendarIcon,
   DollarSignIcon,
-  FileTextIcon
+  FileTextIcon 
 } from "lucide-react"
 
 import { Link } from 'react-router-dom'

@@ -7,12 +7,12 @@ import EmployeeForm from '../components/EmployeeForm'
 const Employees = () => {
 
   const [employees, setEmployees] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true) 
 
   const [search, setSearch] = useState("")
   const [selectDept, setSelectDept] = useState("")
 
-  const [editEmployee, setEditEmployee] = useState(null)
+  const [editEmployee, setEditEmployee] = useState(null) // null because no employee is selected yet when we select it will be a object 
   const [showCreateModel, setShowCreateModel] = useState(false)
 
   // Fetch Employees
@@ -71,8 +71,7 @@ const Employees = () => {
             setEditEmployee(null)
             setShowCreateModel(true)
           }}
-          className="btn-primary flex items-center gap-2 w-full sm:w-auto justify-center"
-        >
+          className="btn-primary flex items-center gap-2 w-full sm:w-auto justify-center">
 
           <Plus size={16} />
 
