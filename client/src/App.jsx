@@ -28,7 +28,7 @@ const App = () => {
           <Route path="/Payslips" element={<Payslips />} />
           <Route path="/settings" element={<Settings/>} />
         </Route>
-        <Route path="/print/payslips/:id" element={<PrintPaySlip />} />
+        <Route path="/print/payslip/:id" element={<PrintPaySlip />} />
         <Route path="*" element={<Navigate to="/dashboard" replace/>} />
       </Routes >
     </>

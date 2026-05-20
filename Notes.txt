@@ -50,15 +50,28 @@ the employee which selected selection option and search values will be filtered 
 component card has functionality such as onDelete onEdit
 e.stopPropagation is written because if there is a div have onclik functionality and a button inside it has an onClick functionality. 
 
-.....Leave form.....
-we use state for leave  adn loading  we will create state to display a modal for isDeleted we will check if the user is false 
+.....Leave .....
+we use state for leave  and loading  we will create state to display a modal for isDeleted we will check if the user is false 
 we will fetch leaves form the asset we usecallbackfuntion to fetch dummyleaves list and a time out for loading 
 useEffect is used to fetch the leaves and from the feched leave we take out the approved leaves by filtering and categorise that filter as casual anual and sick
 create a leave status array and create related Lable icon and value 
+At the body part there are 2 components for leave.jsx leave history and apply leave modal as the structure of the table differs from the employee and admin.
+so while displaying something they check what is there position.and also check if they are not deleted 
+apply for leave and modal for that will only be visible to the employee
+and there are tow apply leave modal and leave history componenet leave history takes values such as leave is admin onUpdate it takse the handle leave update funciton
 
-
-
-
+..Payslips..
+we created array for payslip 
+array for employees booliean for loading
+isAdmin booliean
+a callback function to fetch the payslip dummydaya along with time out and set the loading as false
+a useEffect  to send the callback fucntions when the array value of payslip changes
+onemore useEffct to check is isAdmin chages setEmployees with dummy employees data
+if loading is true return the loading componenet
+and we will write the normal text and create a component for table and pass the detaisl such as payslip and isAdmin
+in that they create a table and in that table th is table header with n number of details 
+and we will check if there is length in the payslip if yes we will map trough the payslip and add the table data using td
+and extra download button is added as td
 
 
 
