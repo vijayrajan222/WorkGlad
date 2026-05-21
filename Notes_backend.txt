@@ -1,0 +1,11 @@
+npm install express cors dotenv multer jsonwebtoken bcrypt mongoose // These are the dependancy used for the server   
+express to create backend server
+cors to connect fronend with backend 
+dotenv 
+multer parce from data
+mongoose 
+bcript encript the password and save in the data base 
+jsonwebtoken authentication
+
+> npm install --save-dev nodemon
+if we run this  code no need  to edit the script to 
