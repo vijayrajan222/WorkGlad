@@ -10,12 +10,16 @@ import attendanceRouter from "./routes/attendanceRoutes.js";
 import leaveRouter from "./routes/leaveRoutes.js";
 import payslipRouter from "./routes/payslipsRoutes.js";
 import dashboardRouter from "./routes/dashboardRoutes.js";
+import { log } from "node:console";
 
 const app = express();
 
 const PORT = process.env.PORT || 4000;
 
-app.use(cors());
+log(process.env.CLIENT_URL)
+app.use(cors({
+    origin: [process.env.CLIENT_URL, "http://localhost:5173"]
+}));
 app.use(express.json());
 app.use(multer().none());
 
