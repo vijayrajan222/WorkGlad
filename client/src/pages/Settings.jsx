@@ -9,12 +9,14 @@ import Loading from '../components/Loading'
 import ProfileForm from '../components/settings/ProfileForm'
 
 import ChangePasswordModal from '../components/settings/ChangePasswordModal'
+import { profileService } from '../services'
 
 const Settings = () => {
 
     const [profile, setProfile] = useState(null)
 
     const [loading, setLoading] = useState(true)
+    const [error, setError] = useState("")
 
     const [showPasswordModal, setShowPasswordModal] = useState(false)
 
@@ -22,33 +24,16 @@ const Settings = () => {
     const fetchProfile = async () => {
 
         setLoading(true)
+        setError("")
 
-        // Fake API
-        setTimeout(() => {
-
-            setProfile({
-
-                firstName: 'John',
-
-                lastName: 'Doe',
-
-                email: 'johndoe@example.com',
-
-                phone: '+91 9876543210',
-
-                designation: 'Product Manager',
-
-                department: 'Product',
-
-                bio: '',
-
-                avatar: null
-
-            })
-
+        try {
+            const data = await profileService.getProfile()
+            setProfile(data)
+        } catch (err) {
+            setError(err.message || "Failed to load profile")
+        } finally {
             setLoading(false)
-
-        }, 1000)
+        }
 
     }
 
@@ -60,6 +45,7 @@ const Settings = () => {
 
     // Loading Screen
     if (loading) return <Loading />
+    if (error) return <p className='text-center text-rose-500 py-12'>{error}</p>
 
     return (
 

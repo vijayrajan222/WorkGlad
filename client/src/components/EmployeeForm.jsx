@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { DEPARTMENTS } from '../assets/assets'
+import { employeeService } from '../services'
 
 const EmployeeForm = ({
     initialData,
@@ -8,9 +8,8 @@ const EmployeeForm = ({
     onCancel
 }) => {
 
-    const navigate = useNavigate()
-
     const [loading, setLoading] = useState(false)
+    const [error, setError] = useState("")
 
     // Convert value to boolean
     const isEditMode = !!initialData
@@ -22,30 +21,43 @@ const EmployeeForm = ({
         e.preventDefault()
 
         setLoading(true)
+        setError("")
 
         // Get form data
         const formData = new FormData(e.target)
+        const value = (name) => String(formData.get(name) || "").trim()
 
         const employeeData = {
-            firstName: formData.get("firstName"),
-            lastName: formData.get("lastName"),
-            phone: formData.get("phone"),
-            joinDate: formData.get("joinDate"),
-            bio: formData.get("bio")
+            firstName: value("firstName"),
+            lastName: value("lastName"),
+            email: value("email"),
+            phone: value("phone"),
+            position: value("position"),
+            department: value("department"),
+            basicSalary: value("basicSalary"),
+            allowances: value("allowances"),
+            deductions: value("deductions"),
+            joinDate: value("joinDate"),
+            password: value("password"),
+            role: value("role"),
+            employmentStatus: value("employmentStatus"),
+            bio: value("bio")
         }
 
-        console.log(employeeData)
-
-        // Fake API delay
-        setTimeout(() => {
-
-            setLoading(false)
-
+        try {
+            if (isEditMode) {
+                await employeeService.updateEmployee(initialData.id || initialData._id, employeeData)
+            } else {
+                await employeeService.createEmployee(employeeData)
+            }
             if (onSuccess) {
                 onSuccess()
             }
-
-        }, 1000)
+        } catch (err) {
+            setError(err.message || "Failed to save employee")
+        } finally {
+            setLoading(false)
+        }
 
     }
 
@@ -55,6 +67,11 @@ const EmployeeForm = ({
             onSubmit={handleSubmit}
             className='space-y-6 max-w-3xl animate-fade-in'
         >
+            {error && (
+                <div className='p-4 bg-rose-50 border border-rose-200 text-rose-700 text-sm rounded-xl'>
+                    {error}
+                </div>
+            )}
 
             {/* Personal Information */}
             <div className='border border-slate-200 rounded-2xl p-6'>
@@ -75,6 +92,8 @@ const EmployeeForm = ({
                         <input
                             name="firstName"
                             required
+                            minLength={2}
+                            maxLength={50}
                             defaultValue={initialData?.firstName}
                             className='w-full border border-slate-200 rounded-xl px-4 py-2 outline-none'
                         />
@@ -91,6 +110,8 @@ const EmployeeForm = ({
                         <input
                             name="lastName"
                             required
+                            minLength={2}
+                            maxLength={50}
                             defaultValue={initialData?.lastName}
                             className='w-full border border-slate-200 rounded-xl px-4 py-2 outline-none'
                         />
@@ -107,6 +128,8 @@ const EmployeeForm = ({
                         <input
                             name="phone"
                             required
+                            minLength={7}
+                            maxLength={20}
                             defaultValue={initialData?.phone}
                             className='w-full border border-slate-200 rounded-xl px-4 py-2 outline-none'
                         />
@@ -146,6 +169,7 @@ const EmployeeForm = ({
                         <textarea
                             name="bio"
                             rows={3}
+                            maxLength={500}
                             defaultValue={initialData?.bio}
                             className='w-full border border-slate-200 rounded-xl px-4 py-3 outline-none resize-none'
                             placeholder='Brief description...'
@@ -222,6 +246,8 @@ const EmployeeForm = ({
                         <input
                             name="position"
                             required
+                            minLength={2}
+                            maxLength={80}
                             defaultValue={initialData?.position}
                             className='w-full border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 transition-all'
                         />
@@ -240,6 +266,7 @@ const EmployeeForm = ({
                             type='number'
                             required
                             min="0"
+                            max="10000000"
                             step="0.01"
                             defaultValue={initialData?.basicSalary || 0}
                             className='w-full border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 transition-all'
@@ -259,6 +286,7 @@ const EmployeeForm = ({
                             type='number'
                             required
                             min="0"
+                            max="10000000"
                             step="0.01"
                             defaultValue={initialData?.allowances || 0}
                             className='w-full border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 transition-all'
@@ -278,6 +306,7 @@ const EmployeeForm = ({
                             type='number'
                             required
                             min="0"
+                            max="10000000"
                             step="0.01"
                             defaultValue={initialData?.deductions || 0}
                             className='w-full border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 transition-all'
@@ -340,6 +369,7 @@ const EmployeeForm = ({
                             name="email"
                             type='email'
                             required
+                            maxLength={120}
                             defaultValue={initialData?.email}
                             className='w-full border border-slate-200 rounded-xl px-4 py-2 outline-none'
                         />
@@ -354,9 +384,11 @@ const EmployeeForm = ({
                             </label>
 
                             <input
-                                name="Password"
+                                name="password"
                                 type='password'
                                 required
+                                minLength={8}
+                                maxLength={72}
                             />
 
                         </div>
@@ -369,8 +401,10 @@ const EmployeeForm = ({
                             </label>
 
                             <input
-                                name="Password"
+                                name="password"
                                 type='password'
+                                minLength={8}
+                                maxLength={72}
                                 placeholder='Leave blank to keep current'
                             />
 

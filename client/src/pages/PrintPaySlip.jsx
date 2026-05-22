@@ -6,9 +6,8 @@ import { format } from 'date-fns'
 
 import { PrinterIcon } from 'lucide-react'
 
-import { dummyPayslipData } from '../assets/assets'
-
 import Loading from '../components/Loading'
+import { payslipService } from '../services'
 
 const PrintPaySlip = () => {
 
@@ -17,26 +16,23 @@ const PrintPaySlip = () => {
   const [payslip, setPayslip] = useState(null)
 
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
 
   useEffect(() => {
+    const fetchPayslip = async () => {
+      try {
+        const data = await payslipService.getPayslipById(id)
+        setPayslip(data)
+      } catch (err) {
+        setError(err.message || "Failed to load payslip")
+      } finally {
+        setLoading(false)
+      }
+    }
 
-    setPayslip(
-
-      dummyPayslipData.find(
-        (slip) => String(slip._id || slip.id) === String(id)
-      )
-
-    )
-
-    setTimeout(() => {
-
-      setLoading(false)
-
-    }, 1000)
-
+    fetchPayslip()
   }, [id])
 
-  // Print Function
   const handlePrint = () => {
 
     window.print()
@@ -44,6 +40,7 @@ const PrintPaySlip = () => {
   }
 
   if (loading) return <Loading />
+  if (error) return <p className='p-10 text-center text-rose-500'>{error}</p>
 
   if (!payslip) {
 
@@ -63,7 +60,6 @@ const PrintPaySlip = () => {
 
       <div className='w-full max-w-4xl bg-white rounded-2xl shadow-lg overflow-hidden'>
 
-        {/* Header */}
         <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 px-8 py-6'>
 
           <div>
@@ -83,7 +79,6 @@ const PrintPaySlip = () => {
 
           </div>
 
-          {/* Print Button */}
           <button
             onClick={handlePrint}
             className='btn-primary flex items-center gap-2'
@@ -97,7 +92,6 @@ const PrintPaySlip = () => {
 
         </div>
 
-        {/* Employee Details */}
         <div className='px-8 py-6 border-b border-slate-100'>
 
           <h2 className='text-lg font-semibold text-slate-900 mb-4'>
@@ -156,7 +150,6 @@ const PrintPaySlip = () => {
 
         </div>
 
-        {/* Salary Table */}
         <div className='px-8 py-6'>
 
           <h2 className='text-lg font-semibold text-slate-900 mb-4'>
@@ -190,7 +183,7 @@ const PrintPaySlip = () => {
                 </td>
 
                 <td className='px-4 py-3 text-right font-medium text-slate-900'>
-                  ₹ {payslip.basicSalary?.toLocaleString()}
+                  Rs. {payslip.basicSalary?.toLocaleString()}
                 </td>
 
               </tr>
@@ -202,7 +195,7 @@ const PrintPaySlip = () => {
                 </td>
 
                 <td className='px-4 py-3 text-right font-medium text-green-600'>
-                  ₹ {payslip.allowances?.toLocaleString()}
+                  Rs. {payslip.allowances?.toLocaleString()}
                 </td>
 
               </tr>
@@ -214,7 +207,7 @@ const PrintPaySlip = () => {
                 </td>
 
                 <td className='px-4 py-3 text-right font-medium text-rose-600'>
-                  ₹ {payslip.deductions?.toLocaleString()}
+                  Rs. {payslip.deductions?.toLocaleString()}
                 </td>
 
               </tr>
@@ -226,7 +219,7 @@ const PrintPaySlip = () => {
                 </td>
 
                 <td className='px-4 py-4 text-right text-lg font-bold text-indigo-700'>
-                  ₹ {payslip.netSalary?.toLocaleString()}
+                  Rs. {payslip.netSalary?.toLocaleString()}
                 </td>
 
               </tr>

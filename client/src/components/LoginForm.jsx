@@ -1,10 +1,12 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import LoginLeftSide from './LoginLeftSide'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { ArrowLeftIcon, EyeIcon, EyeOffIcon, Loader2Icon } from 'lucide-react'
+import { authService } from '../services'
 
 const LoginForm = ({ role, title, subtitle }) => {
 
+  const navigate = useNavigate()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -13,6 +15,17 @@ const LoginForm = ({ role, title, subtitle }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("")
+    setLoading(true)
+
+    try {
+      await authService.login({ email: email.trim(), password: password.trim(), role })
+      navigate('/dashboard', { replace: true })
+    } catch (err) {
+      setError(err.message || "Unable to sign in")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -39,12 +52,12 @@ const LoginForm = ({ role, title, subtitle }) => {
 
             <div>
               <label className='block text-sm font-medium text-slate-700 mb-2'>Email address</label>
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required  placeholder='john@example.com' />
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required maxLength={120} placeholder='john@example.com' />
             </div>
             <div>
               <label className='block text-sm font-medium text-slate-700 mb-2'>Password</label>
               <div className='relative'>
-              <input type={showPassword?"text":"password"} value={password} onChange={(e) => setPassword(e.target.value)} required className='pr-11' placeholder='..........' />
+              <input type={showPassword?"text":"password"} value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} maxLength={72} className='pr-11' placeholder='..........' />
               <button type='button'   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors" onClick={()=>setShowPassword(!showPassword)}>
                 {showPassword?<EyeOffIcon size={18}/>:<EyeIcon size={18}/>}
               </button>
