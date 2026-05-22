@@ -32,9 +32,7 @@ const GeneratePayslipForm = ({ employees = [], onSuccess }) => {
         setLoading(true)
  
         // Replace this block with your real API call, e.g.:
-        // await axios.post('/api/payslips', form)
-        console.log('Submitting payslip:', form)
- 
+        // await axios.post('/api/payslips', form) 
         setTimeout(() => {
             if (onSuccess) onSuccess()
             setLoading(false)
