@@ -7,9 +7,9 @@ import {
 } from "lucide-react"
 
 import Loading from "../components/Loading"
-import { dummyLeaveData } from "../assets/assets"
 import LeaveHistory from '../components/leave/LeaveHistroy'
 import ApplyLeaveModal from '../components/leave/ApplyLeaveModal'
+import { authService, leaveService } from '../services'
 
 const Leave = () => {
 
@@ -17,21 +17,25 @@ const Leave = () => {
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [isDeleted, setIsDeleted] = useState(false)
+  const [error, setError] = useState("")
 
-  const isAdmin = false
+  const isAdmin = authService.getStoredUser()?.role === "ADMIN"
 
   // Fetch Data
-  const fetchLeaves = useCallback(() => {
+  const fetchLeaves = useCallback(async () => {
 
     setLoading(true)
+    setError("")
 
-    setTimeout(() => {
-
-      setLeave(dummyLeaveData)
-
+    try {
+      const result = await leaveService.getLeaves()
+      setLeave(result.data || [])
+      setIsDeleted(!!result.employee?.isDeleted)
+    } catch (err) {
+      setError(err.message || "Failed to load leave applications")
+    } finally {
       setLoading(false)
-
-    }, 1000)
+    }
 
   }, [])
 
@@ -40,19 +44,14 @@ const Leave = () => {
   }, [fetchLeaves])
 
   // Update Status
-  const handleLeaveUpdate = (id, status) => {
-
-    setLeave((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? { ...item, status }
-          : item
-      )
-    )
+  const handleLeaveUpdate = async (id, status) => {
+    await leaveService.updateLeaveStatus(id, status)
+    fetchLeaves()
 
   }
 
   if (loading) return <Loading />
+  if (error) return <p className='text-center text-rose-500 py-12'>{error}</p>
 
   // Stats
   const approvedLeaves = leave.filter(

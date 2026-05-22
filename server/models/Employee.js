@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import {departments} from '../constants/departments'
+import department from "../constants/departments.js";
 
 const employeeSchema = new mongoose.Schema(
   {
@@ -25,7 +25,7 @@ const employeeSchema = new mongoose.Schema(
     joinDate: { type: Date, required: true },
     isDeleted: { type: Boolean, default: false },
     bio: { type: String, default: "" },
-    departments:{type:String,enum:departments}
+    department:{type:String,enum:department, default: "Engineering"}
   },
   { timestamps: true },
 );

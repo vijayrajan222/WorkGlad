@@ -1,0 +1,204 @@
+import Employee from "../models/Employee.js";
+import LeaveApplication from "../models/LeaveApplication.js";
+import { trimString, validateText } from "../utils/validation.js";
+
+export const createLeave = async (req, res) => {
+  try {
+
+    const session = req.session;
+
+    const employee = await Employee.findOne({
+      userId: session.userId,
+    });
+
+    if (!employee) {
+      return res.status(404).json({
+        error: "Employee not found",
+      });
+    }
+
+    if (employee.isDeleted) {
+      return res.status(403).json({
+        error: "Your account is deactivated. You cannot apply for leave.",
+      });
+    }
+
+    const type = trimString(req.body.type).toUpperCase();
+    const startDate = trimString(req.body.startDate);
+    const endDate = trimString(req.body.endDate);
+    const reasonResult = validateText(req.body.reason, "Reason", 5, 300);
+
+    if (!type || !startDate || !endDate) {
+      return res.status(400).json({
+        error: "Missing fields",
+      });
+    }
+    if (!["SICK", "CASUAL", "ANNUAL"].includes(type)) {
+      return res.status(400).json({
+        error: "Invalid leave type",
+      });
+    }
+    if (reasonResult.error) {
+      return res.status(400).json({
+        error: reasonResult.error,
+      });
+    }
+
+    // Future date validation
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (
+      new Date(startDate) <= today ||
+      new Date(endDate) <= today
+    ) {
+      return res.status(400).json({
+        error: "Leave dates must be in the future",
+      });
+    }
+
+    // End date validation
+    if (new Date(endDate) < new Date(startDate)) {
+      return res.status(400).json({
+        error: "End date cannot be before start date",
+      });
+    }
+
+    // Create leave
+    const leave = await LeaveApplication.create({
+      employeeId: employee._id,
+      type,
+      startDate: new Date(startDate),
+      endDate: new Date(endDate),
+      reason: reasonResult.value,
+      status: "PENDING",
+    });
+
+    return res.status(201).json({
+      success: true,
+      data: leave,
+    });
+
+  } catch (error) {
+
+    console.log(error);
+
+    return res.status(500).json({
+      error: "Internal server error",
+    });
+
+  }
+};
+export const getLeave = async (req, res) => {
+
+    try {
+
+        const session = req.session;
+
+        const isAdmin = session.role === "ADMIN";
+
+        // ADMIN
+        if (isAdmin) {
+
+            const status = trimString(req.query.status).toUpperCase();
+
+            const where = status ? { status } : {};
+
+            const leaves = await LeaveApplication.find(where)
+                .populate("employeeId")
+                .sort({ createdAt: -1 });
+
+            const data = leaves.map((l) => {
+
+                const obj = l.toObject();
+
+                return {
+                    ...obj,
+                    id: obj._id.toString(),
+                    employee: obj.employeeId,
+                    employeeId: obj.employeeId?._id?.toString(),
+                };
+
+            });
+
+            return res.json({ data });
+
+        }
+
+        // EMPLOYEE
+        else {
+
+            const employee = await Employee.findOne({
+                userId: session.userId,
+            }).lean();
+
+            if (!employee) {
+                return res.status(404).json({
+                    error: "Not found",
+                });
+            }
+
+            const leaves = await LeaveApplication.find({
+                employeeId: employee._id,
+            }).sort({ createdAt: -1 });
+
+            return res.json({
+                data: leaves,
+                employee: {
+                    ...employee,
+                    id: employee._id.toString(),
+                },
+            });
+
+        }
+
+    } catch (error) {
+
+        console.log(error);
+
+        return res.status(500).json({
+            error: "Failed",
+        });
+
+    }
+
+};
+
+export const updateLeaveStatus = async (req, res) => {
+
+    try {
+
+        const status = trimString(req.body.status).toUpperCase();
+
+        if (!["APPROVED", "REJECTED", "PENDING"].includes(status)) {
+            return res.status(400).json({
+                error: "Invalid status"
+            });
+        }
+
+        const leave = await LeaveApplication.findByIdAndUpdate(
+            req.params.id,
+            { status },
+            { new: true }
+        );
+
+        if (!leave) {
+            return res.status(404).json({
+                error: "Leave not found"
+            });
+        }
+
+        return res.json({
+            success: true,
+            data: leave
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+            error: "Failed"
+        });
+
+    }
+
+}

@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 
 import PasswordInput from './PasswordInput'
+import { authService } from '../../services'
 
 const ChangePasswordModal = ({ onClose }) => {
 
@@ -129,8 +130,11 @@ const ChangePasswordModal = ({ onClose }) => {
 
         setLoading(true)
 
-        // Fake API
-        setTimeout(() => {
+        try {
+            await authService.changePassword({
+                currentPassword: form.currentPassword,
+                newPassword: form.newPassword,
+            })
 
             setMessage({
 
@@ -147,8 +151,13 @@ const ChangePasswordModal = ({ onClose }) => {
                 onClose()
 
             }, 1200)
-
-        }, 1000)
+        } catch (err) {
+            setMessage({
+                type: 'error',
+                text: err.message || 'Failed to update password.'
+            })
+            setLoading(false)
+        }
 
     }
 

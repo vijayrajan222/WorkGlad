@@ -1,46 +1,77 @@
 import { Plus, X, Loader2Icon } from 'lucide-react'
-import React, { useState } from 'react'
- 
+import React, { useMemo, useState } from 'react'
+import { payslipService } from '../../services'
+
 const EMPTY_FORM = {
     employeeId: '',
-    basicSalary: '',
     month: '',
-    bonus: '',
-    deductions: '',
 }
- 
+
+const getMonthValue = (date) => {
+    const month = String(date.getMonth() + 1).padStart(2, "0")
+    return `${date.getFullYear()}-${month}`
+}
+
 const GeneratePayslipForm = ({ employees = [], onSuccess }) => {
- 
+
     const [isOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
- 
-    // FIX: controlled form state — values are now readable on submit
+    const [error, setError] = useState("")
     const [form, setForm] = useState(EMPTY_FORM)
- 
+
+    const currentMonth = useMemo(() => {
+        const date = new Date()
+        date.setDate(1)
+        return getMonthValue(date)
+    }, [])
+
+    const minMonth = useMemo(() => {
+        const date = new Date()
+        date.setDate(1)
+        date.setFullYear(date.getFullYear() - 1)
+        return getMonthValue(date)
+    }, [])
+
+    const selectedEmployee = employees.find((emp) => String(emp.id || emp._id) === String(form.employeeId))
+    const basicSalary = Number(selectedEmployee?.basicSalary || 0)
+    const allowances = Number(selectedEmployee?.allowances || 0)
+    const deductions = Number(selectedEmployee?.deductions || 0)
+    const netSalary = basicSalary + allowances - deductions
+
     const handleChange = (e) => {
         const { name, value } = e.target
         setForm((prev) => ({ ...prev, [name]: value }))
+        setError("")
     }
- 
+
     const handleClose = () => {
         setIsOpen(false)
-        setForm(EMPTY_FORM)   // reset form on close
+        setError("")
+        setForm(EMPTY_FORM)
     }
- 
+
     const handleSubmit = async (e) => {
         e.preventDefault()
         setLoading(true)
- 
-        // Replace this block with your real API call, e.g.:
-        // await axios.post('/api/payslips', form) 
-        setTimeout(() => {
+        setError("")
+
+        const [year, month] = form.month.split("-")
+
+        try {
+            await payslipService.createPayslip({
+                employeeId: form.employeeId,
+                month,
+                year,
+            })
             if (onSuccess) onSuccess()
-            setLoading(false)
             handleClose()
-        }, 1000)
+        } catch (err) {
+            setError(err.message || "Failed to generate payslip")
+        } finally {
+            setLoading(false)
+        }
     }
- 
-    // Button View
+
     if (!isOpen) {
         return (
             <button
@@ -52,31 +83,26 @@ const GeneratePayslipForm = ({ employees = [], onSuccess }) => {
             </button>
         )
     }
- 
+
     return (
         <>
-            {/* Overlay */}
             <div
                 className='fixed inset-0 z-40 bg-black/60 backdrop-blur-sm'
                 onClick={handleClose}
             />
- 
-            {/* Modal */}
+
             <div className='fixed inset-0 z-50 flex items-center justify-center p-4'>
- 
                 <div
                     className='w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden animate-fade-in'
                     onClick={(e) => e.stopPropagation()}
                 >
- 
-                    {/* Header */}
                     <div className='flex items-start justify-between px-6 py-5 border-b border-slate-100'>
                         <div>
                             <h2 className='text-xl font-semibold text-slate-900'>
                                 Generate Payslip
                             </h2>
                             <p className='text-sm text-slate-500 mt-1'>
-                                Create employee salary slip
+                                Uses salary details configured in employee management
                             </p>
                         </div>
                         <button
@@ -87,11 +113,14 @@ const GeneratePayslipForm = ({ employees = [], onSuccess }) => {
                             <X className='w-5 h-5 text-slate-500' />
                         </button>
                     </div>
- 
-                    {/* Form */}
+
                     <form onSubmit={handleSubmit} className='p-6 space-y-5'>
- 
-                        {/* Employee */}
+                        {error && (
+                            <div className='p-4 bg-rose-50 border border-rose-200 text-rose-700 text-sm rounded-xl'>
+                                {error}
+                            </div>
+                        )}
+
                         <div>
                             <label className='block mb-2 text-sm font-medium text-slate-700'>
                                 Employee
@@ -105,31 +134,13 @@ const GeneratePayslipForm = ({ employees = [], onSuccess }) => {
                             >
                                 <option value=''>Select Employee</option>
                                 {employees.map((emp) => (
-                                    <option key={emp.id} value={emp.id}>
+                                    <option key={emp.id || emp._id} value={emp.id || emp._id}>
                                         {emp.firstName} {emp.lastName}
                                     </option>
                                 ))}
                             </select>
                         </div>
- 
-                        {/* Basic Salary */}
-                        <div>
-                            <label className='block mb-2 text-sm font-medium text-slate-700'>
-                                Basic Salary
-                            </label>
-                            <input
-                                type='number'
-                                name='basicSalary'
-                                required
-                                min={0}
-                                placeholder='Enter salary amount'
-                                value={form.basicSalary}
-                                onChange={handleChange}
-                                className='w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500'
-                            />
-                        </div>
- 
-                        {/* Month */}
+
                         <div>
                             <label className='block mb-2 text-sm font-medium text-slate-700'>
                                 Salary Month
@@ -138,45 +149,35 @@ const GeneratePayslipForm = ({ employees = [], onSuccess }) => {
                                 type='month'
                                 name='month'
                                 required
+                                min={minMonth}
+                                max={currentMonth}
                                 value={form.month}
                                 onChange={handleChange}
                                 className='w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500'
                             />
                         </div>
- 
-                        {/* Bonus */}
-                        <div>
-                            <label className='block mb-2 text-sm font-medium text-slate-700'>
-                                Bonus
-                            </label>
-                            <input
-                                type='number'
-                                name='bonus'
-                                min={0}
-                                placeholder='Optional bonus'
-                                value={form.bonus}
-                                onChange={handleChange}
-                                className='w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500'
-                            />
-                        </div>
- 
-                        {/* Deductions */}
-                        <div>
-                            <label className='block mb-2 text-sm font-medium text-slate-700'>
-                                Deductions
-                            </label>
-                            <input
-                                type='number'
-                                name='deductions'
-                                min={0}
-                                placeholder='Optional deductions'
-                                value={form.deductions}
-                                onChange={handleChange}
-                                className='w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500'
-                            />
-                        </div>
- 
-                        {/* Buttons */}
+
+                        {selectedEmployee && (
+                            <div className='grid grid-cols-1 sm:grid-cols-4 gap-3 rounded-2xl border border-slate-200 p-4 bg-slate-50'>
+                                <div>
+                                    <p className='text-xs text-slate-500'>Basic</p>
+                                    <p className='font-semibold text-slate-900'>Rs. {basicSalary.toLocaleString()}</p>
+                                </div>
+                                <div>
+                                    <p className='text-xs text-slate-500'>Allowances</p>
+                                    <p className='font-semibold text-emerald-700'>Rs. {allowances.toLocaleString()}</p>
+                                </div>
+                                <div>
+                                    <p className='text-xs text-slate-500'>Deductions</p>
+                                    <p className='font-semibold text-rose-700'>Rs. {deductions.toLocaleString()}</p>
+                                </div>
+                                <div>
+                                    <p className='text-xs text-slate-500'>Net</p>
+                                    <p className='font-semibold text-indigo-700'>Rs. {netSalary.toLocaleString()}</p>
+                                </div>
+                            </div>
+                        )}
+
                         <div className='flex flex-col sm:flex-row gap-3 pt-2'>
                             <button
                                 type='button'
@@ -200,13 +201,11 @@ const GeneratePayslipForm = ({ employees = [], onSuccess }) => {
                                 )}
                             </button>
                         </div>
- 
                     </form>
- 
                 </div>
             </div>
         </>
     )
 }
- 
+
 export default GeneratePayslipForm

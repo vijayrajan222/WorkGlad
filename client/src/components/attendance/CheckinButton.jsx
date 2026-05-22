@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { attendanceService } from '../../services'
 import {
     Loader2Icon,
     LogInIcon,
@@ -11,20 +12,23 @@ const CheckinButton = ({
 }) => {
 
     const [loading, setLoading] = useState(false)
+    const [error, setError] = useState("")
 
     const handleAttendance = async () => {
 
         setLoading(true)
+        setError("")
 
-        setTimeout(() => {
-
+        try {
+            await attendanceService.clockInOut()
             if (onAction) {
                 onAction()
             }
-
+        } catch (err) {
+            setError(err.message || "Attendance update failed")
+        } finally {
             setLoading(false)
-
-        }, 1000)
+        }
 
     }
 
@@ -50,11 +54,12 @@ const CheckinButton = ({
     }
 
     // Checked In?
-    const isCheckedIn = !!todayRecord?.isCheckedIn
+    const isCheckedIn = !!todayRecord?.checkIn && !todayRecord?.checkOut
 
     return (
 
         <div className='absolute bottom-4 right-4 flex flex-col z-10'>
+            {error && <p className='mb-2 text-xs text-rose-600 bg-white rounded-lg px-3 py-2 shadow'>{error}</p>}
 
     <button
 

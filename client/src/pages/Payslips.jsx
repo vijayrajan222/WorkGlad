@@ -1,47 +1,57 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { dummyEmployeeData, dummyPayslipData } from "../assets/assets"
- 
+
 import Loading from '../components/Loading'
 import PayslipList from '../components/paySlip/PayslipList'
-// FIX: import was present but component was never rendered — now it replaces the plain button
 import GeneratePayslipForm from '../components/paySlip/GeneratePayslipForm'
- 
+import { authService, employeeService, payslipService } from '../services'
+
 const Payslips = () => {
- 
     const [payslips, setPayslips] = useState([])
     const [employees, setEmployees] = useState([])
     const [loading, setLoading] = useState(true)
- 
-    const isAdmin = true
- 
-    const fetchPayslips = useCallback(() => {
+    const [error, setError] = useState("")
+
+    const isAdmin = authService.getStoredUser()?.role === "ADMIN"
+
+    const fetchPayslips = useCallback(async () => {
         setLoading(true)
-        setTimeout(() => {
-            setPayslips(dummyPayslipData)
+        setError("")
+
+        try {
+            const result = await payslipService.getPayslips()
+            setPayslips(result.data || [])
+        } catch (err) {
+            setError(err.message || "Failed to load payslips")
+        } finally {
             setLoading(false)
-        }, 1000)
+        }
     }, [])
- 
+
     useEffect(() => {
         fetchPayslips()
     }, [fetchPayslips])
- 
+
     useEffect(() => {
-        if (isAdmin) {
-            setEmployees(dummyEmployeeData)
+        const fetchEmployees = async () => {
+            if (!isAdmin) return
+
+            try {
+                const data = await employeeService.getEmployees()
+                setEmployees(data)
+            } catch (err) {
+                setError(err.message || "Failed to load employees")
+            }
         }
+
+        fetchEmployees()
     }, [isAdmin])
- 
+
     if (loading) return <Loading />
- 
+    if (error) return <p className='text-center text-rose-500 py-12'>{error}</p>
+
     return (
- 
         <div className='animate-fade-in'>
- 
-            {/* Header */}
             <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8'>
- 
-                {/* Left */}
                 <div>
                     <h1 className='page-title'>Payslips</h1>
                     <p className='page-subtitle'>
@@ -50,26 +60,21 @@ const Payslips = () => {
                             : "Your payslip history"}
                     </p>
                 </div>
- 
-                {/* Right — FIX: replaced dead <button> with the modal component */}
+
                 {isAdmin && (
                     <GeneratePayslipForm
                         employees={employees}
-                        onSuccess={fetchPayslips}   // refreshes the list after generation
+                        onSuccess={fetchPayslips}
                     />
                 )}
- 
             </div>
- 
-            {/* Table */}
+
             <PayslipList
                 payslip={payslips}
                 isAdmin={isAdmin}
             />
- 
         </div>
- 
     )
 }
- 
+
 export default Payslips

@@ -2,13 +2,11 @@
 
 import React, { useState } from 'react'
 import {
-    User,
-    Mail,
-    Briefcase,
     FileText,
     Save,
     Loader2
 } from 'lucide-react'
+import { profileService } from '../../services'
 
 const ProfileForm = ({
     initialData,
@@ -16,22 +14,13 @@ const ProfileForm = ({
 }) => {
 
     const [form, setForm] = useState({
-
-        fullName:
-            `${initialData?.firstName || ""} ${initialData?.lastName || ""}`,
-
-        email:
-            initialData?.email || "",
-
-        position:
-            initialData?.designation || "",
-
         bio:
             initialData?.bio || ""
 
     })
 
     const [loading, setLoading] = useState(false)
+    const [error, setError] = useState("")
 
     // Handle Input
     const handleChange = (e) => {
@@ -51,17 +40,20 @@ const ProfileForm = ({
         e.preventDefault()
 
         setLoading(true)
+        setError("")
 
-        // Fake API
-        setTimeout(() => {
-
-            setLoading(false)
-
+        try {
+            await profileService.updateProfile({
+                bio: form.bio
+            })
             if (onSuccess) {
                 onSuccess()
             }
-
-        }, 1000)
+        } catch (err) {
+            setError(err.message || "Failed to update profile")
+        } finally {
+            setLoading(false)
+        }
 
     }
 
@@ -71,92 +63,20 @@ const ProfileForm = ({
             onSubmit={handleSubmit}
             className='card p-6 mb-8'
         >
+            {error && (
+                <div className='mb-4 p-4 bg-rose-50 border border-rose-200 text-rose-700 text-sm rounded-xl'>
+                    {error}
+                </div>
+            )}
 
             {/* Header */}
             <div className='flex items-center gap-2 pb-5 border-b border-slate-100 mb-6'>
 
-                <User className='w-5 h-5 text-slate-400' />
+                <FileText className='w-5 h-5 text-slate-400' />
 
                 <h2 className='text-lg font-semibold text-slate-900'>
-                    Public Profile
+                    Profile Bio
                 </h2>
-
-            </div>
-
-            {/* Grid */}
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-5 mb-5'>
-
-                {/* Full Name */}
-                <div>
-
-                    <label className='block text-sm font-medium text-slate-700 mb-2'>
-                        Full Name
-                    </label>
-
-                    <div className='relative'>
-
-                        <input
-                            type='text'
-                            name='fullName'
-                            value={form.fullName}
-                            onChange={handleChange}
-                            placeholder='John Doe'
-                            className='w-full border border-slate-200 rounded-xl px-4 py-3 pl-11 outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition'
-                        />
-
-                        <User className='w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2' />
-
-                    </div>
-
-                </div>
-
-                {/* Email */}
-                <div>
-
-                    <label className='block text-sm font-medium text-slate-700 mb-2'>
-                        Email
-                    </label>
-
-                    <div className='relative'>
-
-                        <input
-                            type='email'
-                            name='email'
-                            value={form.email}
-                            onChange={handleChange}
-                            placeholder='johndoe@example.com'
-                            className='w-full border border-slate-200 rounded-xl px-4 py-3 pl-11 outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition'
-                        />
-
-                        <Mail className='w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2' />
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            {/* Position */}
-            <div className='mb-5'>
-
-                <label className='block text-sm font-medium text-slate-700 mb-2'>
-                    Position
-                </label>
-
-                <div className='relative'>
-
-                    <input
-                        type='text'
-                        name='position'
-                        value={form.position}
-                        onChange={handleChange}
-                        placeholder='Product Manager'
-                        className='w-full border border-slate-200 rounded-xl px-4 py-3 pl-11 outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition'
-                    />
-
-                    <Briefcase className='w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2' />
-
-                </div>
 
             </div>
 
@@ -174,6 +94,8 @@ const ProfileForm = ({
                         name='bio'
                         value={form.bio}
                         onChange={handleChange}
+                        minLength={0}
+                        maxLength={500}
                         placeholder='Write a brief bio...'
                         className='w-full border border-slate-200 rounded-xl px-4 py-3 pl-11 outline-none resize-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition'
                     />

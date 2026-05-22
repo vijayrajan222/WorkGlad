@@ -15,20 +15,21 @@ import React, { useEffect, useState } from 'react'
 
 import {
     Link,
-    useLocation
+    useLocation,
+    useNavigate
 } from 'react-router-dom'
 
-import { dummyProfileData } from '../assets/assets'
+import { authService, profileService } from '../services'
 
 const Sidebar = () => {
 
     const { pathname } = useLocation()
+    const navigate = useNavigate()
 
     const [userName, setUserName] = useState("")
+    const [role, setRole] = useState(authService.getStoredUser()?.role || "")
 
     const [mobileOpen, setMobileOpen] = useState(false)
-
-    const role = "ADMIN"
 
     // Navigation
     const navItems = [
@@ -74,16 +75,31 @@ const Sidebar = () => {
     // Logout
     const handleLogout = () => {
 
-        window.location.href = "/login"
+        authService.logout()
+        navigate("/login")
 
     }
 
     // Set Username
     useEffect(() => {
 
-        setUserName(
-            `${dummyProfileData.firstName} ${dummyProfileData.lastName}`
-        )
+        const fetchProfile = async () => {
+            try {
+                const [session, profile] = await Promise.all([
+                    authService.getSession(),
+                    profileService.getProfile()
+                ])
+
+                setRole(session.user?.role || "")
+                setUserName(`${profile.firstName || ""} ${profile.lastName || ""}`.trim() || profile.email || session.user?.email || "")
+            } catch {
+                const user = authService.getStoredUser()
+                setRole(user?.role || "")
+                setUserName(user?.email || "")
+            }
+        }
+
+        fetchProfile()
 
     }, [])
 

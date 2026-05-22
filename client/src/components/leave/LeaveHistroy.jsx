@@ -14,17 +14,15 @@ const LeaveHistory = ({
 
   const [processing, setProcessing] = useState(null)
 
-  const handleStatusUpdate = (id, status) => {
+  const handleStatusUpdate = async (id, status) => {
 
     setProcessing(id)
 
-    setTimeout(() => {
-
-      onUpdate(id, status)
-
+    try {
+      await onUpdate(id, status)
+    } finally {
       setProcessing(null)
-
-    }, 1000)
+    }
 
   }
 
@@ -78,10 +76,14 @@ const LeaveHistory = ({
 
           <tbody>
 
-            {leave.map((item) => (
+            {leave.map((item) => {
+
+              const rowId = item.id || item._id
+
+              return (
 
               <tr
-                key={item.id}
+                key={rowId}
                 className='border-b border-slate-100 hover:bg-slate-50 transition-colors'
               >
 
@@ -90,7 +92,7 @@ const LeaveHistory = ({
 
                   <td className='px-6 py-4 font-medium text-slate-900'>
 
-                    {item.employeeName || "John Doe"}
+                    {item.employeeName || `${item.employee?.firstName || ""} ${item.employee?.lastName || ""}`}
 
                   </td>
 
@@ -157,15 +159,15 @@ const LeaveHistory = ({
                         <button
                           onClick={() =>
                             handleStatusUpdate(
-                              item.id,
+                              rowId,
                               "APPROVED"
                             )
                           }
-                          disabled={processing === item.id}
+                          disabled={processing === rowId}
                           className='p-2 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 transition-colors'
                         >
 
-                          {processing === item.id ? (
+                          {processing === rowId ? (
 
                             <Loader2Icon className='w-4 h-4 animate-spin' />
 
@@ -181,11 +183,11 @@ const LeaveHistory = ({
                         <button
                           onClick={() =>
                             handleStatusUpdate(
-                              item.id,
+                              rowId,
                               "REJECTED"
                             )
                           }
-                          disabled={processing === item.id}
+                          disabled={processing === rowId}
                           className='p-2 rounded-lg bg-rose-100 text-rose-700 hover:bg-rose-200 transition-colors'
                         >
 
@@ -209,7 +211,7 @@ const LeaveHistory = ({
 
               </tr>
 
-            ))}
+            )})}
 
           </tbody>
 

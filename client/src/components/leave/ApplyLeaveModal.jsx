@@ -5,6 +5,7 @@ import {
 } from 'lucide-react'
 
 import React, { useState } from 'react'
+import { leaveService } from '../../services'
 
 const ApplyLeaveModal = ({
     open,
@@ -13,6 +14,7 @@ const ApplyLeaveModal = ({
 }) => {
 
     const [loading, setLoading] = useState(false)
+    const [error, setError] = useState("")
 
     const today = new Date()
 
@@ -29,19 +31,26 @@ const ApplyLeaveModal = ({
         e.preventDefault()
 
         setLoading(true)
+        setError("")
 
-        // Fake API Delay
-        setTimeout(() => {
+        const formData = new FormData(e.target)
 
+        try {
+            await leaveService.createLeave({
+                type: String(formData.get("type") || "").trim(),
+                startDate: String(formData.get("startDate") || "").trim(),
+                endDate: String(formData.get("endDate") || "").trim(),
+                reason: String(formData.get("reason") || "").trim(),
+            })
             if (onSuccess) {
                 onSuccess()
             }
-
-            setLoading(false)
-
             onClose()
-
-        }, 1000)
+        } catch (err) {
+            setError(err.message || "Failed to submit leave request")
+        } finally {
+            setLoading(false)
+        }
 
     }
 
@@ -97,6 +106,11 @@ const ApplyLeaveModal = ({
                         onSubmit={handleSubmit}
                         className='p-6 space-y-5'
                     >
+                        {error && (
+                            <div className='p-4 bg-rose-50 border border-rose-200 text-rose-700 text-sm rounded-xl'>
+                                {error}
+                            </div>
+                        )}
 
                         {/* Leave Type */}
                         <div>
@@ -106,6 +120,7 @@ const ApplyLeaveModal = ({
                             </label>
 
                             <select
+                                name='type'
                                 required
                                 className='w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500'
                             >
@@ -138,6 +153,7 @@ const ApplyLeaveModal = ({
                             </label>
 
                             <input
+                                name='startDate'
                                 type='date'
                                 min={minDate}
                                 required
@@ -154,6 +170,7 @@ const ApplyLeaveModal = ({
                             </label>
 
                             <input
+                                name='endDate'
                                 type='date'
                                 min={minDate}
                                 required
@@ -170,8 +187,11 @@ const ApplyLeaveModal = ({
                             </label>
 
                             <textarea
+                                name='reason'
                                 rows={4}
                                 required
+                                minLength={5}
+                                maxLength={300}
                                 placeholder='Briefly explain your reason...'
                                 className='w-full border border-slate-200 rounded-xl px-4 py-3 outline-none resize-none focus:ring-2 focus:ring-indigo-500'
                             />

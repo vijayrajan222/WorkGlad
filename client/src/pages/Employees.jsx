@@ -1,13 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { Plus, Search, X } from 'lucide-react'
-import { dummyEmployeeData, DEPARTMENTS } from '../assets/assets'
+import { DEPARTMENTS } from '../assets/assets'
 import EmployeeCard from '../components/EmployeeCard'
 import EmployeeForm from '../components/EmployeeForm'
+import { employeeService } from '../services'
 
 const Employees = () => {
 
   const [employees, setEmployees] = useState([])
   const [loading, setLoading] = useState(true) 
+  const [error, setError] = useState("")
 
   const [search, setSearch] = useState("")
   const [selectDept, setSelectDept] = useState("")
@@ -16,21 +18,19 @@ const Employees = () => {
   const [showCreateModel, setShowCreateModel] = useState(false)
 
   // Fetch Employees
-  const fetchEmployees = useCallback(() => {
+  const fetchEmployees = useCallback(async () => {
 
     setLoading(true)
+    setError("")
 
-    const filteredData = dummyEmployeeData.filter((emp) =>
-      selectDept
-        ? emp.department === selectDept
-        : true
-    )
-
-    setEmployees(filteredData)
-
-    setTimeout(() => {
+    try {
+      const data = await employeeService.getEmployees(selectDept ? { department: selectDept } : {})
+      setEmployees(data)
+    } catch (err) {
+      setError(err.message || "Failed to load employees")
+    } finally {
       setLoading(false)
-    }, 500)
+    }
 
   }, [selectDept])
 
@@ -46,6 +46,15 @@ const Employees = () => {
       .includes(search.toLowerCase())
 
   )
+
+  const handleDelete = async (id) => {
+    try {
+      await employeeService.deleteEmployee(id)
+      fetchEmployees()
+    } catch (err) {
+      setError(err.message || "Failed to delete employee")
+    }
+  }
 
   return (
 
@@ -136,6 +145,12 @@ const Employees = () => {
 
         </div>
 
+      ) : error ? (
+
+        <p className="text-center py-16 text-rose-500 bg-white rounded-2xl border border-rose-100">
+          {error}
+        </p>
+
       ) : (
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
@@ -153,7 +168,7 @@ const Employees = () => {
               <EmployeeCard
                 key={emp.id}
                 employee={emp}
-                onDelete={fetchEmployees}
+                onDelete={handleDelete}
                 onEdit={(employee) => {
                   setShowCreateModel(false)
                   setEditEmployee(employee)

@@ -1,25 +1,31 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import Loading from "../components/Loading"
-import { dummyAttendanceData } from "../assets/assets"
 import CheckinButton from '../components/attendance/CheckinButton'
 import AttandanceStats from '../components/attendance/AttandanceStats'
 import AttendanceHistory from '../components/attendance/AttendanceHistory'
+import { attendanceService } from '../services'
 
 const Attendance = () => {
 
   const [history, setHistory] = useState([])
   const [loading, setLoading] = useState(true)
   const [isDeleted, setIsDeleted] = useState(false)
+  const [error, setError] = useState("")
 
   const fetchData = useCallback(async () => {
 
     setLoading(true)
+    setError("")
 
-    setHistory(dummyAttendanceData)
-
-    setTimeout(() => {
+    try {
+      const result = await attendanceService.getAttendance()
+      setHistory(result.data || [])
+      setIsDeleted(!!result.employee?.isDeleted)
+    } catch (err) {
+      setError(err.message || "Failed to load attendance")
+    } finally {
       setLoading(false)
-    }, 1000)
+    }
 
   }, [])
 
@@ -28,6 +34,7 @@ const Attendance = () => {
   }, [fetchData])
 
   if (loading) return <Loading />
+  if (error) return <p className='text-center text-rose-500 py-12'>{error}</p>
 
   // Today's record
   const today = new Date()

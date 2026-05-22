@@ -22,3 +22,6 @@ const leaveApplicationSchema = new mongoose.Schema(
 );
 
 const leaveApplication = mongoose.models.leaveApplication || mongoose.model("LeaveApplicaton",leaveApplicationSchema) 
+
+
+export default leaveApplication

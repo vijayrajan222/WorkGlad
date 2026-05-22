@@ -1,13 +1,16 @@
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { isValidEmail, trimString } from "../utils/validation.js";
 
 export const login = async (req, res) => {
 
     try {
-        const { email, password, role_type } = req.body;
+        const email = trimString(req.body.email).toLowerCase();
+        const password = trimString(req.body.password);
+        const role_type = trimString(req.body.role_type).toLowerCase();
 
-        if (!email || !password) {
+        if (!isValidEmail(email) || !password) {
             return res.status(400).json({
                 error: "Email and password are required"
             });
@@ -79,11 +82,18 @@ export const changePassword = async (req, res) => {
 
         const session = req.session;
 
-        const { currentPassword, newPassword } = req.body;
+        const currentPassword = trimString(req.body.currentPassword);
+        const newPassword = trimString(req.body.newPassword);
 
         if (!currentPassword || !newPassword) {
             return res.status(400).json({
                 error: "Both passwords are required"
+            });
+        }
+
+        if (newPassword.length < 8 || newPassword.length > 72) {
+            return res.status(400).json({
+                error: "New password must be between 8 and 72 characters"
             });
         }
 
