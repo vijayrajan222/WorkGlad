@@ -35,8 +35,20 @@ export const authService = {
     localStorage.removeItem('token')
   },
 
+  getStoredToken() {
+    return localStorage.getItem(AUTH_TOKEN_KEY) || localStorage.getItem('token')
+  },
+
   getStoredUser() {
     const storedUser = localStorage.getItem(AUTH_USER_KEY)
-    return storedUser ? JSON.parse(storedUser) : null
+
+    if (!storedUser) return null
+
+    try {
+      return JSON.parse(storedUser)
+    } catch {
+      localStorage.removeItem(AUTH_USER_KEY)
+      return null
+    }
   },
 }
