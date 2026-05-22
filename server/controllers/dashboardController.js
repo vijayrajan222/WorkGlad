@@ -1,13 +1,14 @@
-import departments from "../constants/departments"
-import Attendance from "../models/Attendance"
-import Employee from "../models/Employee"
-import leaveApplication from "../models/LeaveApplication"
-import Payslip from "../models/Payslip"
+import departments from "../constants/departments.js";
+import Attendance from "../models/Attendance.js";
+import Employee from "../models/Employee.js";
+import LeaveApplication from "../models/LeaveApplication.js";
+import Payslip from "../models/Payslip.js";
 
 export const getDashboard = async (req,res) => {
     try {
-        const sessoin = req.sessoipn
-        if(sessoin.role === 'ADMIN'){
+        const session = req.session;
+
+        if(session.role === "ADMIN"){
             const [totalEmployees,todayAttendance,pendingLeaves] = await Promise.all([
                 Employee.countDocuments({isDeleted:{$ne:true}}),
                 Attendance.countDocuments({
@@ -16,12 +17,13 @@ export const getDashboard = async (req,res) => {
                         $lt: new Date(new Date().setHours(24,0,0,0))
                     }
                 }),
-                leaveApplication.countDocuments({status:"PENDING"})
+                LeaveApplication.countDocuments({status:"PENDING"})
             ])
             return res.json({
                 role:"ADMIN",
                 totalEmployees,
                 totalDepartments:departments.length,
+                todayAttendance,
                 pendingLeaves
             })
         }else{
@@ -41,7 +43,7 @@ export const getDashboard = async (req,res) => {
                         $lt: new Date(today.getFullYear(),today.getMonth()+1,1)
                     }
                 }),
-                leaveApplication.countDocuments({
+                LeaveApplication.countDocuments({
                     employeeId:employee._id,
                     status:"PENDING"
                 }),
@@ -51,6 +53,17 @@ export const getDashboard = async (req,res) => {
                     createdAt:-1
                 }).lean()
             ])
+
+            return res.json({
+                role:"EMPLOYEE",
+                currentMonthAttendance,
+                pendingLeaves,
+                latestPayslip,
+                employee:{
+                    ...employee,
+                    id: employee._id.toString()
+                }
+            })
         }
 
 

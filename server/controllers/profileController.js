@@ -1,4 +1,5 @@
 import Employee from "../models/Employee.js";
+import { validateText } from "../utils/validation.js";
 
 export const getProfile = async (req, res) => {
     try {
@@ -34,8 +35,14 @@ export const updateProfile = async (req, res) => {
             });
         }
 
+        const bio = validateText(req.body.bio || "", "Bio", 0, 500);
+
+        if (bio.error) {
+            return res.status(400).json({error: bio.error});
+        }
+
         await Employee.findByIdAndUpdate(employee._id, {
-            bio: req.body.bio
+            bio: bio.value
         });
 
         return res.json({success: true});

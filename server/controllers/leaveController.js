@@ -1,5 +1,6 @@
 import Employee from "../models/Employee.js";
-import leaveApplication from "../models/LeaveApplication.js";
+import LeaveApplication from "../models/LeaveApplication.js";
+import { trimString, validateText } from "../utils/validation.js";
 
 export const createLeave = async (req, res) => {
   try {
@@ -22,12 +23,24 @@ export const createLeave = async (req, res) => {
       });
     }
 
-    const { type, startDate, endDate, reason } = req.body;
+    const type = trimString(req.body.type).toUpperCase();
+    const startDate = trimString(req.body.startDate);
+    const endDate = trimString(req.body.endDate);
+    const reasonResult = validateText(req.body.reason, "Reason", 5, 300);
 
-    // Validation
-    if (!type || !startDate || !endDate || !reason) {
+    if (!type || !startDate || !endDate) {
       return res.status(400).json({
         error: "Missing fields",
+      });
+    }
+    if (!["SICK", "CASUAL", "ANNUAL"].includes(type)) {
+      return res.status(400).json({
+        error: "Invalid leave type",
+      });
+    }
+    if (reasonResult.error) {
+      return res.status(400).json({
+        error: reasonResult.error,
       });
     }
 
@@ -57,7 +70,7 @@ export const createLeave = async (req, res) => {
       type,
       startDate: new Date(startDate),
       endDate: new Date(endDate),
-      reason,
+      reason: reasonResult.value,
       status: "PENDING",
     });
 
@@ -87,7 +100,7 @@ export const getLeave = async (req, res) => {
         // ADMIN
         if (isAdmin) {
 
-            const status = req.query.status;
+            const status = trimString(req.query.status).toUpperCase();
 
             const where = status ? { status } : {};
 
@@ -155,7 +168,7 @@ export const updateLeaveStatus = async (req, res) => {
 
     try {
 
-        const { status } = req.body;
+        const status = trimString(req.body.status).toUpperCase();
 
         if (!["APPROVED", "REJECTED", "PENDING"].includes(status)) {
             return res.status(400).json({
