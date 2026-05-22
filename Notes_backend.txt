@@ -9,3 +9,8 @@ jsonwebtoken authentication
 
 > npm install --save-dev nodemon
 if we run this  code no need  to edit the script to 
+
+We created server.js connected the server using express and connected db 
+
+cors , express.json , multer is used as middleware 
+connected with db using a async function and awaited in the server
