@@ -22,6 +22,7 @@ app.use("/api/employees",employeesRouter)
 app.use("/api/profile",profileRouter)
 app.use("/api/attendance",attendanceRouter)
 
+
 await connectDB();
 
 app.listen(PORT, () => {
