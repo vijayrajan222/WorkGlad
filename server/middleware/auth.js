@@ -26,15 +26,20 @@ export const protect = (req, res, next) => {
         }
 
         req.session = session;
+         
+        if (req.session.role !== "ADMIN") {
+            return res.status(403).json({
+                error: "Access denied"
+            });
+        }
 
         next();
 
     } catch (error) {
 
-        return res.status(401).json({
-            error: "Unauthorized"
+      return res.status(403).json({
+            error: "Access denied"
         });
-
     }
 
 };

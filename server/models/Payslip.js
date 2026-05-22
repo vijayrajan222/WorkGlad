@@ -7,38 +7,36 @@ const payslipSchema = new mongoose.Schema(
       ref: "Employee",
       required: true,
     },
-
     month: {
       type: String,
       required: true,
     },
-
     year: {
       type: Number,
       required: true,
     },
-
     basicSalary: {
       type: Number,
       default: 0,
     },
-
     allowances: {
       type: Number,
       default: 0,
     },
-
     deductions: {
       type: Number,
       default: 0,
     },
-
     netSalary: {
       type: Number,
       default: 0,
     },
   },
   { timestamps: true }
+);
+payslipSchema.index(
+  { employeeId: 1, month: 1, year: 1 },
+  { unique: true }
 );
 
 const Payslip =

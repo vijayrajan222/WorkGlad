@@ -4,15 +4,29 @@ import Payslip from "../models/Payslip.js";
 export const createPayslip = async (req, res) => {
 
     try {
-        const {employeeId, month, year, basicSalary, allowances, deductions} = req.body;
+const { employeeId, month, year, basicSalary, allowances, deductions } = req.body;
+          if (!employeeId || month === undefined || year === undefined || basicSalary === undefined) {
+          return res.status(400).json({ error: "Missing fields" });
+         }
 
-        if (!employeeId || !month || !year || !basicSalary)
-        {
-            return res.status(400).json({error: "Missing fields"});
+       const parsedMonth = Number(month);
+        const parsedYear = Number(year);
+        const parsedBasic = Number(basicSalary);
+        const parsedAllowances = Number(allowances ?? 0);
+        const parsedDeductions = Number(deductions ?? 0);
+
+        const invalidNumber =
+            !Number.isFinite(parsedMonth) ||
+            !Number.isFinite(parsedYear) ||
+            !Number.isFinite(parsedBasic) ||
+            !Number.isFinite(parsedAllowances) ||
+            !Number.isFinite(parsedDeductions);
+
+        if (invalidNumber || parsedMonth < 1 || parsedMonth > 12 || parsedYear < 2000 || parsedBasic < 0 || parsedAllowances < 0 || parsedDeductions < 0) {
+            return res.status(400).json({ error: "Invalid payroll input" });
         }
 
-        const netSalary = Number(basicSalary) + Number(allowances || 0) - Number(deductions || 0);
-
+        const netSalary = parsedBasic + parsedAllowances - parsedDeductions;
         const payslip = await Payslip.create({
             employeeId,
             month: Number(month),
@@ -70,20 +84,24 @@ export const getPayslips = async (req, res) => {
 };
 
 export const getPayslipById = async (req, res) => {
-
     try {
         const payslip = await Payslip.findById(req.params.id).populate("employeeId").lean();
-
         if (!payslip) {
             return res.status(404).json({error: "Not found"});
         }
-
+        const isAdmin = req.session.role === "ADMIN";
+        if (!isAdmin) {
+            const employee = await Employee.findOne({ userId: req.session.userId }).lean();
+            const ownerId = payslip.employeeId?._id?.toString?.() || payslip.employeeId?.toString?.();
+            if (!employee || ownerId !== employee._id.toString()) {
+                return res.status(403).json({ error: "Forbidden" });
+            }
+        }
         const result = {
             ...payslip,
             id: payslip._id.toString(),
             employee: payslip.employeeId,
         };
-
         return res.json(result);
 
     } catch (error) {
